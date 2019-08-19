@@ -1,14 +1,236 @@
 (function() {
-    //匿名函数
-    
-    //通常js对象调用已存在函数：obj.func()，若方法不存在，又不想重复定义该方法，可以使用call或apply借用
-    
-    //obj2借用obj1的bar方法
-    //var obj1 = {}; obj1.bar = function(){...}
-    //var obj2 = {}; obj.bar.call(obj1);
-    
-    //用call借用匿名函数，此处this可不传，参数为null或undefined时会自动指向全局对象
-    //console.log(this); 浏览器下输出是Window
-    
-    //自执行方法，参照：(function(){...}()) 闭包封装变量和函数，不暴露局部变量，不污染全局变量，大多数库和框架都采用此结构
+    var root = this;
+    var _ = function(obj) {
+        if (obj instanceof _) return obj;
+        if (!(this instanceof _)) return new _(obj);
+        this._wrapped = obj;
+    };
+ 
+    if (typeof exports !== 'undefined') {
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = _;
+        }
+        exports._ = _;
+    } else {
+        root._ = _;
+    }
+ 
+    if (typeof define === 'function' && define.amd) {
+        define('underscore', [], function() {
+            return _;
+        });
+    }
+
+    _.VERSION = '0.0.1';
+
+    // 减少在原型链查找的次数
+    var push = Array.prototype.push,
+    silce = Array.prototype.slice,
+    toString = Object.prototype.toString,
+    hasOwnProperty = Object.prototype.hasOwnProperty;
+
+    var nativeIsArray = Array.isArray,
+    nativeKeys = Object.keys,
+    nativeBind = Function.prototype.bind,
+    nativeCreate = Object.create;
+
+    var property = function(key) {
+        return function(obj) {
+            return obj == null ? void 0 : obj[key];
+        };
+    };
+
+    var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
+
+    var getLength = property('length');
+
+    // 返回类数组对象 
+    var isArrayLike = function(collection) {
+        var length = getLength(collection);
+        
+        return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
+    }
+
+    // 判断是否为 DOM 元素
+    _.isElement = function(obj) {
+        return !!(obj && obj.nodeType === 1);
+    };
+
+    // 
+    _.isArray = nativeIsArray || function(obj) {
+        return toString.call(obj) === '[object Array]';
+    };
+
+    // 
+    _.isObject = function(obj) {
+        var type = typeof obj;
+        return type === 'function' || type === 'object' && !!obj;
+    };
+
+    // 
+    _.isNull = function(obj) {
+        return obj === null;
+    };
+
+    _.isBoolean = function(obj) {
+        return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
+    };
+
+    _.isUndefined = function(obj) {
+        return obj === void 0;
+    }
+
+    _.isArguments =  function(obj) {
+        return toString.call(obj) === '[object Arguments]'
+    }
+
+    _.isFunction =  function(obj) {
+        return toString.call(obj) === '[object Function]'
+    }
+
+    _.isString =  function(obj) {
+        return toString.call(obj) === '[object String]'
+    }
+
+    _.isNumber =  function(obj) {
+        return toString.call(obj) === '[object Number]'
+    }
+
+    _.isDate =  function(obj) {
+        return toString.call(obj) === '[object Date]'
+    }
+
+    _.isRegExp =  function(obj) {
+        return toString.call(obj) === '[object RegExp]'
+    }
+
+    _.isError =  function(obj) {
+        return toString.call(obj) === '[object Error]'
+    }
+
+    // ----------Array------------ //
+
+    // 返回array（数组）的第一个元素。传递 n参数将返回数组中从第一个元素开始的n个元素
+    _.first = _.head = _.take = function(array, n) {
+        if (array == null) return undefined;
+        if (n == null) return array[0];
+
+        return _.initial(array, array.length - n);
+    };
+
+    // 返回数组中除了最后一个元素外的其他全部元素。
+    // 传递 n参数将从结果中排除从最后一个开始的 n 个元素
+    _.initial = function(array, n = 1) {
+        var result = [],
+        index = 0;
+
+        for (var i = 0; i < array.length - n; i++) {
+            result[index++] = array[i];
+        }
+        return result;
+    };
+
+    // 返回数组里的后面的 n 个元素
+    _.last = function(array, n) {
+        if (array == null) return undefined;
+        if (n == null) return array[array.length - 1];
+
+        return _.rest(array, Math.max(0, array.length - n));
+    };
+
+    // 返回数组中除了第一个元素外的其他全部元素。传递 n 参数将返回从n开始的剩余所有元素
+    _.rest = _.tail = _.drop = function(array, n=1) {
+        var index = 0,
+        result = [];
+
+        for (var i = n; i < array.length; i++) {
+            result[index++] = array[i];
+        }
+
+        return result;
+    };
+
+    // 返回一个除去所有false值的 array副本。 在javascript中, false, null, 0, "", undefined 和 NaN 都是false值.
+    _.compact = function(array) {
+        var i = 0;
+        const res = [];
+
+        if (array == null) {
+            return res;
+        }
+
+        for (var value of array) {
+            if (value) {
+                res[i++] = value;
+            }
+        }
+
+        return res;
+    };
+
+    var flatten = function(input, shallow, strict, startIndex) {
+        var output = [],
+        idx = 0;
+
+        for (var i = startIndex || 0, length = getLength(input); i < length; i++) {
+            var value = input[i];
+
+            if (isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) {
+                if (!shallow) {
+                    value = flatten(value, shallow, strict);
+                }
+
+                var j = 0,
+                len = value.length;
+
+                output.length += len;
+
+                while (j < len) {
+                    output[idx++] = value[j++];
+                }
+            } else if (!strict) {
+                output[idx++] = value;
+            }
+        }
+        return output;
+    };
+
+    // 将一个嵌套多层的数组 array（数组） (嵌套可以是任何层数)转换为只有一层的数组。 
+    // 如果你传递 shallow参数，数组将只减少一维的嵌套。
+    _.flatten = function(array, shallow) {
+        return flatten(array, shallow, false)
+    }
+
+    // 类似于without，但返回的值来自array参数数组，并且不存在于other 数组
+    _.difference = function(array) {
+        var rest = flatten(arguments, true, true, 1);
+
+        return
+    }
+
+    // 将数组转换为对象。传递任何一个单独[key, value]对的列表，或者一个键的列表和一个值得列表。
+    // 如果存在重复键，最后一个值将被返回
+    _.object = function(list, value) {
+        var result = {};
+
+        for (var i=0, length=getLength(list); i<length; i++) {
+            if (value) {
+                result[list[i]] = value[i];
+            } else {
+                result[list[i][0]] = list[i][1];
+            }
+        }
+
+        return result;
+    };
+
+
+
+    // -------Objects--------//
+
+    // 判断对象中是否有指定 key
+    _.has = function(obj, key) {
+        return obj != null && hasOwnProperty.call(obj, key);
+    };
+
 }.call(this));
