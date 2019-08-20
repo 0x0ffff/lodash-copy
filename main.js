@@ -37,24 +37,24 @@
     var optimizeCb = function(func, context, argCount) {
         if (context === void 0) return func;
 
-        switch (argCount == null ? 3 : argCount) {
-            case 1:
-                return function(value) {
-                    return func.call(context, value);
-                };
-            case 2:
-                return function(value, other) {
-                    return func.call(context, value, other);
-                };
-            case 3:
-                return function(value, index, collection) {
-                    return func.call(context, value, index, collection);
-                };
-            case 4:
-                return function(accumulator, value, index, collection) {
-                    return func.call(context, accumulator, value, index, collection);
-                };
-        }
+        // switch (argCount == null ? 3 : argCount) {
+        //     case 1:
+        //         return function(value) {
+        //             return func.call(context, value);
+        //         };
+        //     case 2:
+        //         return function(value, other) {
+        //             return func.call(context, value, other);
+        //         };
+        //     case 3:
+        //         return function(value, index, collection) {
+        //             return func.call(context, value, index, collection);
+        //         };
+        //     case 4:
+        //         return function(accumulator, value, index, collection) {
+        //             return func.call(context, accumulator, value, index, collection);
+        //         };
+        // }
 
         return function() {
             return func.apply(context, arguments);
@@ -67,6 +67,29 @@
         if (_.isObject(value)) return _.matcher(value);
         return _.property(value);
     }
+
+    var createAssigner = function(keysFunc, undefinedOnly) {
+        return function(obj) {
+            var length = arguments.length;
+            if (length < 2 || obj == null) {
+                return obj;
+            }
+
+            for (var index = 1; index < length; index++) {
+                var source  = arguments[index],
+                keys = keysFunc(source),
+                l = keys.length;
+
+                for (var i = 0; i < l; i++) {
+                    var key = keys[i];
+                    if (!undefinedOnly || obj[key] === void 0) {
+                        obj[key] = source[key];
+                    }
+                }
+            }
+            return obj;
+        };
+    };
 
     _.iteratee = function(value, context) {
         return cb(value, context, Infinity)
@@ -89,29 +112,32 @@
         return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
     }
 
-    _.each = function(obj, callback) {
-        var length, i = 0;
+    // 遍历list中的所有元素，按顺序用遍历输出每个元素。
+    // 如果传递了context参数，则把iteratee绑定到context对象上。
+    _.each = _.forEach = function(obj, iteratee, context) {
+        // 根据 context 的不同，确定不同的迭代函数
+        iteratee = optimizeCb(iteratee, context);
+
+        var i,
+        length;
 
         if (isArrayLike(obj)) {
-            length = obj.length;
-
-            for (; i<length; i++) {
-                if (callback.call(obj[i], obj[i], i) === false) {
-                    break;
-                }
+            // 数组
+            for (i = 0, length = obj.length; i < length; i++) {
+                iteratee(obj[i], i, obj);
             }
         } else {
-            for (i in obj) {
-                if (callback.call(obj[i], obj[i], i) === false) {
-                    break;
-                }
+            // 对象
+            var keys = _.keys(obj);
+            for (i = 0, length = keys.length; i < length; i++) {
+                iteratee(obj[keys[i]], keys[i], obj);
             }
         }
 
         return obj;
-    }
+    };
 
-    _.functions = function(obj) {
+    _.functions = _.methods = function(obj) {
         var names = [];
         for (var key in obj) {
             if (_.isFunction(obj[key])) {
@@ -313,6 +339,144 @@
 
     _.property = property;
 
+    // 返回一个对象的 keys 组成的数组
+    _.keys = function(obj) {
+        if (!_.isObject(obj)) return [];
+
+        if (nativeKeys) return nativeKeys(obj);
+
+        var keys = [];
+        for (var key in obj) {
+            if (!_.has(obj, key)) {
+                keys.push(key);
+            }
+        }
+
+        return keys;
+    };
+
+    _.allKeys = function(obj) {
+        if (!_.isObject(obj)) return [];
+
+        if (nativeKeys) return nativeKeys(obj);
+        var keys = [];
+        for (var key in obj) {
+            keys.push(key);
+        }
+        return keys;
+    }
+
+    // 返回object对象所有的属性值。
+    // _.values({one: 1, two: 2, three: 3});
+    // ==> [1, 2, 3]
+    _.values = function(obj) {
+        var keys = _.keys(obj),
+        length = keys.length,
+        values = Array(length);
+
+        for (var i = 0; i < length; i++) {
+            values[i] = obj[keys[i]];
+        }
+
+        return values;
+    };
+
+    // 将一个对象转换为元素为 [key, value] 形式的数组
+    // _.pairs({one: 1, two: 2, three: 3});
+    // (3) [Array(2), Array(2), Array(2)]
+    //     0: (2) ["one", 1]
+    //     1: (2) ["two", 2]
+    //     2: (2) ["three", 3]
+    _.pairs = function(obj) {
+        var keys = _.keys(obj),
+        length = keys.length,
+        pairs = Array(length);
+
+        for (var i = 0; i < length; i++) {
+            pairs[i] = [keys[i], obj[keys[i]]];
+        }
+
+        return pairs;
+    };
+
+    // 返回一个object副本，使其键（keys）和值（values）对换
+    // _.invert({Moe: "Moses", Larry: "Louis", Curly: "Jerome"});
+    // ==> {Moses: "Moe", Louis: "Larry", Jerome: "Curly"}
+    _.invert = function(obj) {
+        var res = {},
+        keys = _.keys(obj);
+
+        for (var i = 0, length = keys.length; i < length; i++) {
+            res[obj[keys[i]]] = keys[i];
+        }
+
+        return res;
+    };
+
+    _.extend = createAssigner(_.allKeys);
+
+    _.extendOwn = createAssigner(_.keys);
+
+    // 返回一个object副本，只过滤出keys(有效的键组成的数组)参数指定的属性值。
+    // 或者接受一个判断函数，指定挑选哪个key。
+    _.pick = function(object, oiteratee, context) {
+        var res = {},
+        obj = object,
+        iteratee,
+        keys;
+
+        if (obj == null) return res;
+
+        if (_.isFunction(oiteratee)) {
+            // 如果是函数
+            keys = _.allKeys(obj);
+            iteratee = optimizeCb(oiteratee, context);
+        } else {
+            // 不是函数，展开参数
+            keys = flatten(arguments, false, false, 1);
+            // 转为函数判断，iteratee 返回的是 false/true
+            iteratee = function(value, key, obj) {
+                return key in obj;
+            };
+            obj = Object(obj);
+        }
+
+        // 这里遍历 object 取出符合条件的
+        for (var i = 0, length = keys.length; i < length; i++) {
+            var key = keys[i],
+            value = obj[key];
+
+            if (iteratee(value, key, obj)) {
+                res[key] = value;
+            }
+        }
+
+        return res;
+    };
+
+    _.omit = function(obj, iteratee, context) {
+        
+    }
+
+    _.matcher = function(attrs) {
+        attrs = _.extendOwn({}, attrs);
+        return function(obj) {
+            return _.isMatch(obj, attrs);
+        };
+    };
+
+    _.isMatch = function(object, attrs) {
+        var keys = _.keys(attrs), length = keys.length;
+        if (object == null) return !length;
+        var obj = Object(object);
+        for (var i = 0; i < length; i++) {
+            var key = keys[i];
+            if (attrs[key] !== obj[key] || !(key in obj)) return false;
+        }
+
+        return true;
+    }
+
 
     //---------Utility---------//
 
@@ -328,13 +492,12 @@
         };
     };
 
-    // 
+    // 返回一个 min 和 max 之间的随机整数。如果你只传递一个参数，那么将返回 0 和这个参数之间的整数。
     _.random = function(min, max) {
         if (max == null) {
             max = min;
             min = 0;
         }
-
         return min + Math.floor(Math.random() * (max - min + 1));
     };
 
@@ -347,7 +510,7 @@
     };
 
 
-    // ----------mixin
+    // 在 _.mixin(_) 前添加自己定义的方法
     _.mixin = function(obj) {
         _.each(_.functions(obj), function(name) {
             var func = _[name] = obj[name];
