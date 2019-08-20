@@ -1,1 +1,1 @@
-# lodash-copy
+# copy

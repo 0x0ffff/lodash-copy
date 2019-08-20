@@ -34,6 +34,44 @@
     nativeBind = Function.prototype.bind,
     nativeCreate = Object.create;
 
+    var optimizeCb = function(func, context, argCount) {
+        if (context === void 0) return func;
+
+        switch (argCount == null ? 3 : argCount) {
+            case 1:
+                return function(value) {
+                    return func.call(context, value);
+                };
+            case 2:
+                return function(value, other) {
+                    return func.call(context, value, other);
+                };
+            case 3:
+                return function(value, index, collection) {
+                    return func.call(context, value, index, collection);
+                };
+            case 4:
+                return function(accumulator, value, index, collection) {
+                    return func.call(context, accumulator, value, index, collection);
+                };
+        }
+
+        return function() {
+            return func.apply(context, arguments);
+        };
+    };
+
+    var cb = function(value, context, argCount) {
+        if (value == null) return _.identity;
+        if (_.isFunction(value)) return optimizeCb(value, context, argCount);
+        if (_.isObject(value)) return _.matcher(value);
+        return _.property(value);
+    }
+
+    _.iteratee = function(value, context) {
+        return cb(value, context, Infinity)
+    }
+
     var property = function(key) {
         return function(obj) {
             return obj == null ? void 0 : obj[key];
@@ -50,6 +88,38 @@
         
         return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
     }
+
+    _.each = function(obj, callback) {
+        var length, i = 0;
+
+        if (isArrayLike(obj)) {
+            length = obj.length;
+
+            for (; i<length; i++) {
+                if (callback.call(obj[i], obj[i], i) === false) {
+                    break;
+                }
+            }
+        } else {
+            for (i in obj) {
+                if (callback.call(obj[i], obj[i], i) === false) {
+                    break;
+                }
+            }
+        }
+
+        return obj;
+    }
+
+    _.functions = function(obj) {
+        var names = [];
+        for (var key in obj) {
+            if (_.isFunction(obj[key])) {
+                names.push(key)
+            }
+        }
+        return names.sort();
+    };
 
     // 判断是否为 DOM 元素
     _.isElement = function(obj) {
@@ -72,8 +142,12 @@
         return obj === null;
     };
 
+    _.isNaN = function(obj) {
+        return _.isNumber(obj) && obj !== +obj;
+    }
+
     _.isBoolean = function(obj) {
-        return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
+        return toString.call(obj) === '[object Boolean]';
     };
 
     _.isUndefined = function(obj) {
@@ -121,13 +195,13 @@
     // 返回数组中除了最后一个元素外的其他全部元素。
     // 传递 n参数将从结果中排除从最后一个开始的 n 个元素
     _.initial = function(array, n = 1) {
-        var result = [],
+        var res = [],
         index = 0;
 
         for (var i = 0; i < array.length - n; i++) {
-            result[index++] = array[i];
+            res[index++] = array[i];
         }
-        return result;
+        return res;
     };
 
     // 返回数组里的后面的 n 个元素
@@ -201,6 +275,10 @@
         return flatten(array, shallow, false)
     }
 
+    _.without = function(array) {
+
+    }
+
     // 类似于without，但返回的值来自array参数数组，并且不存在于other 数组
     _.difference = function(array) {
         var rest = flatten(arguments, true, true, 1);
@@ -232,5 +310,58 @@
     _.has = function(obj, key) {
         return obj != null && hasOwnProperty.call(obj, key);
     };
+
+    _.property = property;
+
+
+    //---------Utility---------//
+
+    // 返回与传入参数相等的值. 相当于数学里的: f(x) = x
+    _.identity = function(value) {
+        return value;
+    }
+
+    // 
+    _.constant = function(value) {
+        return function() {
+            return value;
+        };
+    };
+
+    // 
+    _.random = function(min, max) {
+        if (max == null) {
+            max = min;
+            min = 0;
+        }
+
+        return min + Math.floor(Math.random() * (max - min + 1));
+    };
+
+    // 返回undefined，不论传递给它的是什么参数。
+    _.noop = function() {}
+
+    // 返回当前时间的 "时间戳"（单位 ms）
+    _.now = Date.now || function() {
+        return new Date().getTime();
+    };
+
+
+    // ----------mixin
+    _.mixin = function(obj) {
+        _.each(_.functions(obj), function(name) {
+            var func = _[name] = obj[name];
+            _.prototype[name] = function() {
+                var args = [this._wrapped];
+
+                push.apply(args, arguments);
+
+                return func.apply(_, args);
+            };
+        });
+        return _;
+    };
+
+    _.mixin(_);
 
 }.call(this));
