@@ -34,27 +34,9 @@
     nativeBind = Function.prototype.bind,
     nativeCreate = Object.create;
 
-    var optimizeCb = function(func, context, argCount) {
+    var optimizeCb = function(func, context) {
+        // 如果没有 context，返回 func
         if (context === void 0) return func;
-
-        // switch (argCount == null ? 3 : argCount) {
-        //     case 1:
-        //         return function(value) {
-        //             return func.call(context, value);
-        //         };
-        //     case 2:
-        //         return function(value, other) {
-        //             return func.call(context, value, other);
-        //         };
-        //     case 3:
-        //         return function(value, index, collection) {
-        //             return func.call(context, value, index, collection);
-        //         };
-        //     case 4:
-        //         return function(accumulator, value, index, collection) {
-        //             return func.call(context, accumulator, value, index, collection);
-        //         };
-        // }
 
         return function() {
             return func.apply(context, arguments);
@@ -248,6 +230,37 @@
         }
         return true;
     };
+
+    function createIndexFinder(dir, predicateFind, sortedIndex) {
+        return function(array, item, idx) {
+            var i = 0,
+            length = getLength(array);
+
+            if (typeof idx == 'number') {
+                if (dir > 0) {
+                    i = idx >= 0 ? idx : Math.max(idx+length, i);
+                } else {
+                    length = idx >=0 ? Math.min(idx+1, length) : idx+length+1;
+                }
+            } else if (sortedIndex && idx && length) {
+                idx = sortedIndex(array, item);
+                return array[idx] === item ? idx : -1;
+            }
+
+            if (item !== item) {
+                idx = predicateFind(slice.call(array, i, length), _.isNaN);
+                return idx >= 0 ? idx+i : -1;
+            }
+
+            for (idx = dir > 0 ? i : length -1; idx >= 0 && idx < length; idx += dir) {
+                if (array[idx] === item) {
+                    return idx;
+                }
+            }
+
+            return -1;
+        };
+    }
 
     // 遍历数组（每个元素）或者对象的每个元素（value）
     // 对每个元素执行 iteratee 迭代方法
