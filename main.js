@@ -229,6 +229,24 @@
             }
         }
         return false;
+    };
+
+    // 判断数组中的每个元素或者对象中每个 value 值是否都满足 predicate 函数中的判断条件
+    // 如果是，则返回 ture；否则返回 false（有一个不满足就返回 false）
+    _.every = _.all = function(obj, predicate, context) {
+        predicate = cb(predicate, context);
+
+        var keys = !isArrayLike(obj) && _.keys(obj),
+        length = (obj || keys).length;
+
+        for (var i = 0; i < length; i++) {
+            var currentKey = keys ? keys[i] : i;
+            // 如果有一个元素满足条件，则返回 false
+            if (!predicate(obj[currentKey], currentKey, obj)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // ----------Array------------ //
