@@ -247,7 +247,24 @@
             }
         }
         return true;
-    }
+    };
+
+    // 遍历数组（每个元素）或者对象的每个元素（value）
+    // 对每个元素执行 iteratee 迭代方法
+    // 将结果保存到新的数组中，并返回
+    _.map = _.collect = function(obj, iteratee, context) {
+        iteratee = cb(iteratee, context);
+
+        var keys = !isArrayLike(obj) && _.keys(obj),
+        length = (keys || obj).length,
+        res = Array(length);
+
+        for (var i = 0; i < length; i++) {
+            var currentKey = keys ? keys[i] : i;
+            res[i] = iteratee(obj[currentKey], currentKey, obj);
+        }
+        return res;
+    };
 
     // ----------Array------------ //
 
