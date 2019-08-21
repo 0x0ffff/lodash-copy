@@ -208,6 +208,29 @@
         return toString.call(obj) === '[object Error]'
     }
 
+    // ---------Collections----------- //
+
+    // 如果list中有任何一个元素通过 predicate 的真值检测就返回true。
+    // 一旦找到了符合条件的元素, 就直接中断对list的遍历
+    // _.some([null, 0, 'yes', false]);
+    // ==> true
+    _.some = _.any = function(obj, predicate, context) {
+        // 根据 context 返回函数
+        predicate = cb(predicate, context);
+
+        var keys = !isArrayLike(obj) && _.keys(obj),
+        length = (keys || obj).length;
+
+        for (var i = 0; i < length; i++) {
+            var currentKey = keys ? keys[i] : i;
+            // 如果有一个元素满足条件，则返回 true
+            if (predicate(obj[currentKey], currentKey, obj)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ----------Array------------ //
 
     // 返回array（数组）的第一个元素。传递 n参数将返回数组中从第一个元素开始的n个元素
@@ -455,7 +478,7 @@
     };
 
     _.omit = function(obj, iteratee, context) {
-        
+
     }
 
     _.matcher = function(attrs) {
