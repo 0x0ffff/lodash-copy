@@ -279,6 +279,21 @@
         return res;
     };
 
+    // 寻找数组或者对象中所有满足条件的元素
+    _.filter = _.select = function(obj, predicate, context) {
+        var res = [];
+
+        predicate = cb(predicate, context);
+
+        _.each(obj, function(value, index, list) {
+            if (predicate(value, index, list)) {
+                res.push(value);
+            }
+        });
+
+        return res;
+    }
+
     // ----------Array------------ //
 
     // 返回array（数组）的第一个元素。传递 n参数将返回数组中从第一个元素开始的n个元素
@@ -436,6 +451,33 @@
         return range;
     };
 
+    _.indexOf = function(array, value) {
+        return array.indexOf(value)
+    };
+
+    _.lastIndexOf = function(array, value, fromIndex = array.length-1) {
+        return array.lastIndexOf(value, fromIndex)
+    }
+
+    _.sortedIndex = function(array, obj, iteratee, context) {
+        iteratee = cb(iteratee, context, 1);
+
+        var value = iteratee(obj);
+
+        var low = 0,
+        high = getLength(array);
+
+        while(low < high) {
+            var mid = Math.floor((low + high) / 2);
+            if (iteratee(array[mid]) < value) {
+                low = mid + 1;
+            } else {
+                high = mid;
+            }
+        }
+
+        return low;
+    };
 
 
     // -------Objects--------//
