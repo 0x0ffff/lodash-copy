@@ -399,6 +399,23 @@
         return result;
     };
 
+    // 将 每个arrays中相应位置的值合并在一起。
+    _.zip = function(...arrays) {
+        if (arrays.length === 0 || arrays[0].length === 0) {
+            return [];
+        }
+
+        // 从一个类似数组或可迭代对象中创建一个新的，浅拷贝的数组实例
+        var res = Array.from({length: arrays[0].length}, () => []);
+        for (var i = 0; i < arrays.length; i++) {
+            for (var j = 0; j < arrays[i].length; j++) {
+                res[j][i] = arrays[i][j];
+            }
+        }
+
+        return res;
+    };
+
 
 
     // -------Objects--------//
