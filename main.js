@@ -25,7 +25,7 @@
 
     // 减少在原型链查找的次数
     var push = Array.prototype.push,
-    silce = Array.prototype.slice,
+    slice = Array.prototype.slice,
     toString = Object.prototype.toString,
     hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -292,7 +292,19 @@
         });
 
         return res;
-    }
+    };
+
+    _.contains = _.includes = _.include = function(obj, item, fromIndex, guard) {
+        if (!isArrayLike(obj)) {
+            obj = _.values(obj);
+        }
+
+        if (typeof fromIndex != 'number' || guard) {
+            fromIndex = 0;
+        }
+
+        return _.indexOf(obj, item, fromIndex) >= 0;
+    };
 
     // ----------Array------------ //
 
@@ -387,15 +399,47 @@
         return flatten(array, shallow, false)
     }
 
+    // 返回一个删除所有values值后的 array副本。
     _.without = function(array) {
-
-    }
+        return _.difference(array, slice.call(arguments, 1));
+    };
 
     // 类似于without，但返回的值来自array参数数组，并且不存在于other 数组
     _.difference = function(array) {
         var rest = flatten(arguments, true, true, 1);
 
-        return
+        return _.filter(array, function(value) {
+            return !_.contains(rest, value);
+        });
+    };
+
+    // 返回 array去重后的副本
+    _.uniq = function(array) {
+        return _.filter(array, (item, index, collection) => collection.indexOf(item) === index);
+    };
+
+    // 返回传入的 arrays（数组）并集
+    _.union = function() {
+        return _.uniq(flatten(arguments, true, true));
+    };
+
+    // 返回传入 arrays（数组）交集
+    _.intersection = function(array) {
+        var res = [];
+
+        var argsLength = arguments.length;
+
+        for (var i = 0, length = getLength(array); i < length; i++) {
+            var item = array[i];
+
+            if (_.contains(res, item)) continue;
+
+            for (var j = 1; j < argsLength; j++) {
+                if (!_.contains(arguments[j], item)) break;
+            }
+            if (j === argsLength) res.push(item);
+        }
+        return res;
     }
 
     // 将数组转换为对象。传递任何一个单独[key, value]对的列表，或者一个键的列表和一个值得列表。
@@ -451,8 +495,8 @@
         return range;
     };
 
-    _.indexOf = function(array, value) {
-        return array.indexOf(value)
+    _.indexOf = function(array, value, fromIndex=0) {
+        return array.indexOf(value, fromIndex);
     };
 
     _.lastIndexOf = function(array, value, fromIndex = array.length-1) {
