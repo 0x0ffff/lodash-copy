@@ -789,6 +789,16 @@
     // 转义HTML字符串，替换&, &lt;, &gt;, &quot;, &#96;, 和 &#x2F
     _.unescape = createEscaper(unescapeMap);
 
+    // 如果对象 object 中的属性 property 是函数, 则调用它, 否则, 返回它
+    _.result = function(object, property, fallback) {
+        var value = object == null ? void 0 : object[property];
+
+        if (value === void 0) {
+            value = fallback;
+        }
+        return _.isFunction(value) ? value.call(object) : value
+    }
+
     //-----------------------------------------------------------------------//
     // 在 _.mixin(_) 前添加自己定义的方法
     _.mixin = function(obj) {
