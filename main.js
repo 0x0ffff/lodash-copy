@@ -1,24 +1,23 @@
 (function() {
-    var root = this;
+    var root = (typeof self == 'object' && self.self == self && self) ||
+        (typeof global == 'object' && global.global == global && global) ||
+        this || {};
+
     var _ = function(obj) {
         if (obj instanceof _) return obj;
         if (!(this instanceof _)) return new _(obj);
         this._wrapped = obj;
     };
+
+    var previousUnderscore = root._;
  
-    if (typeof exports !== 'undefined') {
-        if (typeof module !== 'undefined' && module.exports) {
+    if (typeof exports !== 'undefined' && !exports.nodeType) {
+        if (typeof module !== 'undefined' && module.exports && !module.nodeType) {
             exports = module.exports = _;
         }
         exports._ = _;
     } else {
         root._ = _;
-    }
- 
-    if (typeof define === 'function' && define.amd) {
-        define('underscore', [], function() {
-            return _;
-        });
     }
 
     _.VERSION = '0.0.1';
@@ -523,6 +522,13 @@
         return low;
     };
 
+    // ----------String------------------//
+
+    // 字符串反转
+    _.reverse = function(string) {
+        return string.split('').reverse().join('');
+    };
+
     // -------Functions --------//
 
     // 延迟触发某方法
@@ -730,10 +736,15 @@
 
     //---------Utility---------//
 
+    _.noConflict = function() {
+        root._ = previousUnderscore;
+        return this;
+    };
+
     // 返回与传入参数相等的值. 相当于数学里的: f(x) = x
     _.identity = function(value) {
         return value;
-    }
+    };
 
     // 
     _.constant = function(value) {
@@ -752,7 +763,7 @@
     };
 
     // 返回undefined，不论传递给它的是什么参数。
-    _.noop = function() {}
+    _.noop = function() {};
 
     // 返回当前时间的 "时间戳"（单位 ms）
     _.now = Date.now || function() {
@@ -817,4 +828,11 @@
 
     _.mixin(_);
 
-}.call(this));
+    // // 兼容 AMD 规范
+    if (typeof define === 'function' && define.amd) {
+        define('underscore', [], function() {
+            return _;
+        });
+    }
+
+})();
