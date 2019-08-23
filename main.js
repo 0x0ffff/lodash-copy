@@ -523,6 +523,16 @@
         return low;
     };
 
+    // -------Functions --------//
+
+    // 延迟触发某方法
+    _.delay = function(func, wait) {
+        var args  = slice.call(arguments, 2);
+
+        return setTimeout(function() {
+            return func.apply(null, args);
+        }, wait);
+    };
 
     // -------Objects--------//
 
