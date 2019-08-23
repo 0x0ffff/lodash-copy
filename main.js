@@ -759,7 +759,37 @@
         return new Date().getTime();
     };
 
+    var escapeMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '`': '&#x60;'
+    };
 
+    var unescapeMap = _.invert(escapeMap);
+
+    var createEscaper = function(map) {
+        var escaper = function(match) {
+            return map[match];
+        }
+
+        var source = '(?:' + _.keys(map).join('|') + ')';
+        var testRegexp = RegExp(source);
+        var replaceRegexp = RegExp(source, 'g');
+        return function(string) {
+            string = string == null ? '' : '' + string;
+            return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
+        };
+    };
+
+    // // 转义HTML字符串，替换&, <, >, ", ', 和 /字符。
+    _.escape = createEscaper(escapeMap);
+    // 转义HTML字符串，替换&, &lt;, &gt;, &quot;, &#96;, 和 &#x2F
+    _.unescape = createEscaper(unescapeMap);
+
+    //-----------------------------------------------------------------------//
     // 在 _.mixin(_) 前添加自己定义的方法
     _.mixin = function(obj) {
         _.each(_.functions(obj), function(name) {
