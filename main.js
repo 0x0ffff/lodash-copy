@@ -306,6 +306,16 @@
     };
 
     // ----------Array------------ //
+    
+    // 将数组（array）拆分成多个 size 长度的区块，并将这些区块组成一个新数组。
+    // 如果 array 无法被分割成全部等长的区块，那么最后剩余的元素将组成一个区块
+    _.chunk = function(array, size=1) {
+        var res = [];
+        for (var i = 0; i < array.length; i+=size) {
+            res.push(array.slice(i, i+size));
+        }
+        return res;
+    };
 
     // 返回array（数组）的第一个元素。传递 n参数将返回数组中从第一个元素开始的n个元素
     _.first = _.head = _.take = function(array, n) {
