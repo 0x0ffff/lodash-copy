@@ -317,6 +317,24 @@
         return res;
     };
 
+    // 创建一个新数组，将 array 与任何数组或值连接在一起。
+    _.concat = function() {
+        var length = arguments.length;
+        if (!length) {
+            return [];
+        }
+
+        var res = [];
+        for (var i = 0; i < length; i++) {
+            if(_.isArray(arguments[i])) {
+                res.push(...arguments[i]);
+            } else {
+                res.push(arguments[i]);
+            }
+        }
+        return res;
+    };
+
     // 返回array（数组）的第一个元素。传递 n参数将返回数组中从第一个元素开始的n个元素
     _.first = _.head = _.take = function(array, n) {
         if (array == null) return undefined;
