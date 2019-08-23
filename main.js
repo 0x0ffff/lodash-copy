@@ -534,6 +534,13 @@
         }, wait);
     };
 
+    // 返回一个 predicate 方法的对立方法
+    _.negate = function(predicate) {
+        return function() {
+            return !predicate.apply(this, arguments);
+        };
+    };
+
     // -------Objects--------//
 
     // 判断对象中是否有指定 key
