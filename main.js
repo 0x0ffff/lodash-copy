@@ -335,6 +335,26 @@
         return res;
     };
 
+    // 使用 value 值来填充（替换） array，从 start 位置开始, 到 end 位置结束（但不包含 end 位置）。
+    _.fill = function(array, value, start, end) {
+        var length = array ? array.length : 0;
+        if (!length) {
+            return [];
+        }
+        if (!start || typeof start != 'number') {
+            start = 0;
+        }
+        if (!end || typeof end != 'number') {
+            end = length;
+        }
+
+        for (var i = start; i < end; i++) {
+            array[i] = value;
+        }
+
+        return array;
+    }
+
     // 返回array（数组）的第一个元素。传递 n参数将返回数组中从第一个元素开始的n个元素
     _.first = _.head = _.take = function(array, n) {
         if (array == null) return undefined;
