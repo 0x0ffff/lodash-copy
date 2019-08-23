@@ -557,6 +557,29 @@
         };
     };
 
+    // 创建一个函数, 只有在运行了 count 次之后才有效果
+    _.after = function(times, func) {
+        return function() {
+            if (--times < 1) {
+                return func.apply(this, arguments);
+            }
+        };
+    };
+
+    // 创建一个函数,调用不超过count 次。 当count已经达到时，最后一个函数调用的结果 是被记住并返回 。
+    _.before = function(tiems, func) {
+        var temp;
+        return function() {
+            if (--times > 0) {
+                temp = func.apply(this, arguments);
+            }
+            if (tiems <= 1) {
+                func = null;
+            }
+            return temp;
+        };
+    };
+
     // -------Objects--------//
 
     // 判断对象中是否有指定 key
