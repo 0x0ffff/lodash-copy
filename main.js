@@ -541,6 +541,22 @@
         };
     };
 
+    // 返回函数集 functions 组合后的复合函数
+    _.compose = function() {
+        var args = arguments,
+        start = args.length - 1;
+
+        return function() {
+            var i = start,
+            res = args[start].apply(this, arguments);
+
+            while(i--) {
+                res = args[i].call(this, res);
+            }
+            return res;
+        };
+    };
+
     // -------Objects--------//
 
     // 判断对象中是否有指定 key
