@@ -575,6 +575,34 @@
         return array == null ? '' : Array.prototype.join.call(array, separator);
     };
 
+    // 移除数组中 predicate 返回为真值的所有元素，并返回移除元素组成的数组。
+    // 会改变传入的 array
+    _.remove = function(array, predicate) {
+        var res = [];
+
+        // 兼容性
+        if (!array && array.length) {
+            return res;
+        }
+        
+        var i = -1,
+        index = [],
+        length = array.length;
+        
+        while(++i < length) {
+            var value = array[i];
+            if (predicate(value, index, array)) {
+                res.push(value);
+                index.unshift(i);
+            }
+        }
+
+        for (var temp of index) {
+            array.splice(temp, 1);
+        }
+        return res;
+    }
+
     // ----------String------------------//
 
     // 字符串反转
