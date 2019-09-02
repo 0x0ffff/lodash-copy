@@ -621,6 +621,22 @@
         return res;
     }
 
+    // 反转 array，使得第一个元素变为最后一个元素，第二个元素变为倒数第二个元素，依次类推。
+    // 会改变原数组 array
+    _.reverseArray = function(array) {
+        var length = array.length;
+        var halfLen = Math.floor(length / 2);
+        if (length === 0) return [];
+
+        for (var i = 0; i < halfLen; i++) {
+            var temp = array[i];
+            array[i] = array[length-i-1];
+            array[length-i-1] = temp;
+        }
+
+        return array;
+    }
+
     // ----------String------------------//
 
     // 字符串反转
