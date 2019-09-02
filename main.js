@@ -610,6 +610,13 @@
         return string.split('').reverse().join('');
     };
 
+    // 替换 string 字符串中匹配的 pattern 为给定的 replacement
+    _.replace = function() {
+        var string = toString(arguments[0]);
+
+        return arguments.length < 3 ? string : string.replace(arguments[1], arguments[2])
+    }
+
     // -------Functions --------//
 
     // 延迟触发某方法
