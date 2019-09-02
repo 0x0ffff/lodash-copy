@@ -848,6 +848,36 @@
         return true;
     }
 
+    // 浅拷贝
+    _.shallowCopy = function(obj) {
+        if (!_.isObject(obj)) return;
+
+        var newObj = obj instanceof Array ? [] : {};
+
+        for (var key in obj) {
+            if (_.has(obj, key)) {
+                newObj[key] = obj[key];
+            }
+        }
+
+        return newObj;
+    }
+
+    // 深拷贝
+    // 递归拷贝以及子对象
+    _.deepCopy = function(obj) {
+        if (!_.isObject(obj)) return;
+
+        var newObj = obj instanceof Array ? [] : {};
+        for (var key in obj) {
+            if (_.has(obj, key)) {
+                newObj[key] = typeof obj[key] === 'object' ? deepCopy(obj[key]) : obj[key];
+            }
+        }
+
+        return newObj;
+    }
+
 
     //---------Utility---------//
 
