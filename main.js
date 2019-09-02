@@ -570,6 +570,11 @@
         return low;
     };
 
+    // 将 array 中的所有元素转换为由 separator 分隔的字符串
+    _.join = function(array, separator) {
+        return array == null ? '' : Array.prototype.join.call(array, separator);
+    };
+
     // ----------String------------------//
 
     // 字符串反转
