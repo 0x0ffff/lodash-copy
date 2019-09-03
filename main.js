@@ -896,6 +896,11 @@
         return res;
     }
 
+    // 随机生成六位数字验证码
+    _.randomCode = function() {
+        return Math.floor(Math.random() * 1000000).toString().padStart(6, "0");
+    }
+
 
     //---------Utility---------//
 
