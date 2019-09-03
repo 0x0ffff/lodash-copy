@@ -878,6 +878,24 @@
         return newObj;
     }
 
+    // ---------------Number-----------//
+
+    // 千分位数字
+    _.num2Thousand = function(num) {
+        var num = (num || 0).toString();
+        var res = '';
+
+        while (num.length > 3) {
+            res = ',' + num.slice(-3) + res;
+            num = num.slice(0, num.length-3);
+        }
+        if (num) {
+            res = num + res;
+        }
+
+        return res;
+    }
+
 
     //---------Utility---------//
 
