@@ -6,6 +6,9 @@
 
 throttle 和 debounce 的应用场景应该是分的很清楚的
 
+- debounce：把触发非常频繁的事件（比如按键）合并成一次执行。
+- throttle：保证每 X 毫秒恒定的执行次数，比如每200ms检查下滚动位置，并触发 CSS 动画。
+
 ```js
 // 简版 debounce
 function debounce(method, context) {
