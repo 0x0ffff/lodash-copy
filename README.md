@@ -32,3 +32,57 @@ window.onsrcoll = debounce(print);
 
 - 按一个按钮发送 AJAX：给 click 加了 debounce 后就算用户不停地点这个按钮，也只会最终发送一次；如果是 throttle 就会间隔发送几次
 - 监听滚动事件判断是否到页面底部自动加载更多：给 scroll 加了 debounce 后，只有用户停止滚动后，才会判断是否到了页面底部；如果是 throttle 的话，只要页面滚动就会间隔一段时间判断一次
+
+## `call`、`apply` and `bind`
+
+> call、apply 方法在使用一个指定的 this 值和若干个指定的参数值的前提下，调用某个函数或方法
+
+```js
+Function.prototype.myCall = function(context) {
+    context = context || window;
+    context.fn = this;
+    var args = [];
+
+    for (var i=1, len=arguments.length; i<len; i++) {
+        args.push('arguments[' + i + ']');
+    }
+
+    var result = eval('context.fn(' + args + ')');
+
+    delete context.fn;
+    return result;
+}
+```
+
+```js
+Function.prototype.myApply = function(context, arr) {
+    context = context || window;
+    context.fn = this;
+
+    var result;
+
+    if (!arr) {
+        result = context.fn();
+    } else {
+        var args = [];
+        for (var i=0, len=arr.length; i<len; i++) {
+            args.push('arr[' + i + ']');
+        }
+        result = eval('context.fn(' + args + ')');
+    }
+
+    delete context.fn;
+    return result;
+}
+```
+
+> bind 方法会创建一个新函数，当这个新函数被调用时，bind 的第一个参数将作为它运行的 this，之后的一序列参数将会在传递的实参前传入作为它的参数
+
+```js
+Function.prototype.myBind = function (context) {
+    var that = this;
+    return function() {
+        return that.apply(context, arguments);
+    }
+}
+```
