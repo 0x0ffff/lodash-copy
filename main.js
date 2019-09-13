@@ -646,6 +646,29 @@
 
     // -------Functions --------//
 
+    // 缓存某函数的计算结果
+    _.memoize = function(func, hasher) {
+        var memoize = function(key) {
+            var cache = memoize.cache;
+
+            // 这里是 key 的求得
+            var address = '' + (hasher ? hasher.apply(this, arguments) : key);
+
+            // 如果还没有就缓存
+            if (_.has(cache, address)) {
+                cache[address] = func.apply(this, arguments);
+            }
+
+            return cache[address];
+        }
+
+        // cache 以键值对的方式存储
+        memoize.cache = {};
+
+        // 返回一个函数
+        return memoize;
+    }
+
     // 延迟触发某方法
     _.delay = function(func, wait) {
         var args  = slice.call(arguments, 2);
