@@ -832,16 +832,16 @@
         return keys;
     };
 
-    _.allKeys = function(obj) {
-        if (!_.isObject(obj)) return [];
+    // _.allKeys = function(obj) {
+    //     if (!_.isObject(obj)) return [];
 
-        if (nativeKeys) return nativeKeys(obj);
-        var keys = [];
-        for (var key in obj) {
-            keys.push(key);
-        }
-        return keys;
-    }
+    //     if (nativeKeys) return nativeKeys(obj);
+    //     var keys = [];
+    //     for (var key in obj) {
+    //         keys.push(key);
+    //     }
+    //     return keys;
+    // }
 
     // 返回object对象所有的属性值。
     // _.values({one: 1, two: 2, three: 3});
