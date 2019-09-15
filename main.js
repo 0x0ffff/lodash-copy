@@ -118,77 +118,6 @@
         return obj;
     };
 
-    _.functions = _.methods = function(obj) {
-        var names = [];
-        for (var key in obj) {
-            if (_.isFunction(obj[key])) {
-                names.push(key)
-            }
-        }
-        return names.sort();
-    };
-
-    // 判断是否为 DOM 元素
-    _.isElement = function(obj) {
-        return !!(obj && obj.nodeType === 1);
-    };
-
-    // 
-    _.isArray = nativeIsArray || function(obj) {
-        return toString.call(obj) === '[object Array]';
-    };
-
-    // 
-    _.isObject = function(obj) {
-        var type = typeof obj;
-        return type === 'function' || type === 'object' && !!obj;
-    };
-
-    // 
-    _.isNull = function(obj) {
-        return obj === null;
-    };
-
-    _.isNaN = function(obj) {
-        return _.isNumber(obj) && obj !== +obj;
-    }
-
-    _.isBoolean = function(obj) {
-        return toString.call(obj) === '[object Boolean]';
-    };
-
-    _.isUndefined = function(obj) {
-        return obj === void 0;
-    }
-
-    _.isArguments =  function(obj) {
-        return toString.call(obj) === '[object Arguments]'
-    }
-
-    _.isFunction =  function(obj) {
-        return toString.call(obj) === '[object Function]'
-    }
-
-    _.isString =  function(obj) {
-        return toString.call(obj) === '[object String]'
-    }
-
-    _.isNumber =  function(obj) {
-        return toString.call(obj) === '[object Number]'
-    }
-
-    _.isDate =  function(obj) {
-        return toString.call(obj) === '[object Date]'
-    }
-
-    _.isRegExp =  function(obj) {
-        return toString.call(obj) === '[object RegExp]'
-    }
-
-    _.isError =  function(obj) {
-        return toString.call(obj) === '[object Error]'
-    }
-
     // ---------Collections----------- //
 
     // 如果list中有任何一个元素通过 predicate 的真值检测就返回true。
@@ -982,6 +911,77 @@
         }
 
         return newObj;
+    }
+
+    _.functions = _.methods = function(obj) {
+        var names = [];
+        for (var key in obj) {
+            if (_.isFunction(obj[key])) {
+                names.push(key)
+            }
+        }
+        return names.sort();
+    };
+
+    // 判断是否为 DOM 元素
+    _.isElement = function(obj) {
+        return !!(obj && obj.nodeType === 1);
+    };
+
+    // 
+    _.isArray = nativeIsArray || function(obj) {
+        return toString.call(obj) === '[object Array]';
+    };
+
+    // 
+    _.isObject = function(obj) {
+        var type = typeof obj;
+        return type === 'function' || type === 'object' && !!obj;
+    };
+
+    // 
+    _.isNull = function(obj) {
+        return obj === null;
+    };
+
+    _.isNaN = function(obj) {
+        return _.isNumber(obj) && obj !== +obj;
+    }
+
+    _.isBoolean = function(obj) {
+        return toString.call(obj) === '[object Boolean]';
+    };
+
+    _.isUndefined = function(obj) {
+        return obj === void 0;
+    }
+
+    _.isArguments =  function(obj) {
+        return toString.call(obj) === '[object Arguments]'
+    }
+
+    _.isFunction =  function(obj) {
+        return toString.call(obj) === '[object Function]'
+    }
+
+    _.isString =  function(obj) {
+        return toString.call(obj) === '[object String]'
+    }
+
+    _.isNumber =  function(obj) {
+        return toString.call(obj) === '[object Number]'
+    }
+
+    _.isDate =  function(obj) {
+        return toString.call(obj) === '[object Date]'
+    }
+
+    _.isRegExp =  function(obj) {
+        return toString.call(obj) === '[object RegExp]'
+    }
+
+    _.isError =  function(obj) {
+        return toString.call(obj) === '[object Error]'
     }
 
     // ---------------Number-----------//
