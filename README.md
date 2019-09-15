@@ -86,3 +86,40 @@ Function.prototype.myBind = function (context) {
     }
 }
 ```
+
+## 拷贝
+
+- 浅拷贝：将 B 对象拷贝到 A 对象中，但不包括 B 里面的子对象
+- 深拷贝：将 B 对象拷贝到 A 对象中，包括 B 里面的子对象
+
+```js
+// 浅拷贝
+    _.shallowCopy = function(obj) {
+        if (!_.isObject(obj)) return;
+
+        var newObj = obj instanceof Array ? [] : {};
+
+        for (var key in obj) {
+            if (_.has(obj, key)) {
+                newObj[key] = obj[key];
+            }
+        }
+
+        return newObj;
+    }
+
+    // 深拷贝
+    // 递归拷贝以及子对象
+    _.deepCopy = function(obj) {
+        if (!_.isObject(obj)) return;
+
+        var newObj = obj instanceof Array ? [] : {};
+        for (var key in obj) {
+            if (_.has(obj, key)) {
+                newObj[key] = typeof obj[key] === 'object' ? deepCopy(obj[key]) : obj[key];
+            }
+        }
+
+        return newObj;
+    }
+```
