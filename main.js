@@ -1084,6 +1084,18 @@
         return _.isFunction(value) ? value.call(object) : value
     }
 
+    // ---------------Chaining--------------- //
+
+    _.chain = function(obj) {
+        var instance = _(obj);
+        instance._chain = true;
+        return instance;
+    };
+
+    var result = function(instance, obj) {
+        return instance._chain ? _(obj).chain() : obj;
+    };
+
     //-----------------------------------------------------------------------//
     // 在 _.mixin(_) 前添加自己定义的方法
     _.mixin = function(obj) {
@@ -1094,13 +1106,38 @@
 
                 push.apply(args, arguments);
 
-                return func.apply(_, args);
+                return result(this, func.apply(_, args));
             };
         });
-        return _;
     };
 
     _.mixin(_);
+
+    // 将 Array 原型链上有的方法都添加到 underscore 中
+    _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
+        var method = Array.prototype[name];
+        _.prototype[name] = function() {
+            var obj = this._wrapped;
+            method.apply(obj, arguments);
+
+            if ((name === 'shift' || name === 'splice') && obj.length === 0) {
+                delete obj[0];
+            }
+
+            return result(this, obj);
+        };
+    });
+
+    _.each(['concat', 'join', 'slice'], function(name) {
+        var method = Array.prototype[name];
+        _.prototype[name] = function() {
+            return result(this, method.apply(this._wrapped, arguments));
+        };
+    });
+
+    _.prototype.value = function() {
+        return this._wrapped;
+    };
 
     // // 兼容 AMD 规范
     if (typeof define === 'function' && define.amd) {
