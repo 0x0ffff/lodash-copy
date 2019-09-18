@@ -548,7 +548,7 @@
             array.splice(temp, 1);
         }
         return res;
-    }
+    };
 
     // 反转 array，使得第一个元素变为最后一个元素，第二个元素变为倒数第二个元素，依次类推。
     // 会改变原数组 array
@@ -564,7 +564,7 @@
         }
 
         return array;
-    }
+    };
 
     // ----------String------------------//
 
@@ -596,7 +596,7 @@
 
         // 返回一个函数
         return memoize;
-    }
+    };
 
     // 延迟触发某方法
     _.delay = function(func, wait) {
