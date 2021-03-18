@@ -640,13 +640,13 @@
     };
 
     // 创建一个函数,调用不超过count 次。 当count已经达到时，最后一个函数调用的结果 是被记住并返回 。
-    _.before = function(tiems, func) {
+    _.before = function(times, func) {
         var temp;
         return function() {
             if (--times > 0) {
                 temp = func.apply(this, arguments);
             }
-            if (tiems <= 1) {
+            if (times <= 1) {
                 func = null;
             }
             return temp;
@@ -728,7 +728,7 @@
                 result = func.apply(context, args);
 
                 if (!timeout) context = args = null;
-            } else if (!tiems && options.trailing !== false) {
+            } else if (!timeout && options.trailing !== false) {
                 timeout = setTimeout(later, remaining);
             }
 
